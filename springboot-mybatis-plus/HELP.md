@@ -66,4 +66,4 @@ mybatis-plus:
  [官网](https://mp.baomidou.com/guide/annotation.html)
      
 ---
-### [springboot 项目 第一次 搭建](file://E:/Projects/Idea/springBootProject/springboot_start/HELP.md)
+### [springboot 项目 第一次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-start/HELP.md)
