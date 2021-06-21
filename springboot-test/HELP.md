@@ -18,4 +18,4 @@
 文中添加了部分其他的代码
 
 ---
-### [springboot 项目 第二次 搭建](file://E:/Projects/Idea/springBootProject/springboot-mybatis-plus/HELP.md)
+### [springboot 项目 第二次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-mybatis-plus/HELP.md)
