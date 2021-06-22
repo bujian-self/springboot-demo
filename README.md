@@ -1,5 +1,6 @@
 # springboot-demo
 自己学习用的
-### [springboot 项目 第一次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-start/HELP.md)
-### [springboot 项目 第二次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-mybatis-plus/HELP.md)
-### [springboot 项目 第三次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-test/HELP.md)
+### [创建springboot项目](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-start/HELP.md)
+### [集成 mybatis-plus](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-mybatis-plus/HELP.md)
+### [添加 单元测试](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-test/HELP.md)
+### [使用 Swagger 生成API文档](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-swagger/HELP.md)
