@@ -36,7 +36,7 @@ logging:
   config: classpath:logback-spring.xml
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-在`src\main\resources`路径下添加文件`logback-spring.xml`文件
+在`src\main\resources`路径下添加文件`logback-spring.xml`文件  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [文件内容参考](https://www.cnblogs.com/zhangjianbing/p/8992897.html)
 * 注  
