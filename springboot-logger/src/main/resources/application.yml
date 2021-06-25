@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: springboot-logger
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
+
+mybatis-plus:
+#  mapper.xml扫描路径
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  configuration:
+#    数据库下划线转驼峰命名映射
+    map-underscore-to-camel-case: true
+#    自动映射列到字段或属性
+    auto-mapping-behavior: full
+#    sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+#      配置逻辑删除字段为1是删除
+      logic-not-delete-value: 1
+#      配置逻辑删除字段为0是未删除
+      logic-delete-value: 0
+
+logging:
+  # 原生配置 当文件和配置同时存在时 优先启用xml文件
+  # 当xml配置文件不是默认的几个名称 需要移除原配置 重新导入新配置
+  config: classpath:logback-spring.xml
+  # 简单实现
+  level:
+    root: warn
+    org:
+      springframework:
+        web: error
+        security: debug
+      hibernate: error
+    com:
+      bujian: info
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %+5level ${PID} --- [%+22thread] %-41logger{15}: %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %+5level ${PID} --- [%+22thread] %-41logger{15}: %msg%n'
+  file:
+    path: ${spring.application.name}
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 7
+      file-name-pattern: logs/%d{yyyyMMdd}-%i.log
+      total-size-cap: 500MB
+
+
