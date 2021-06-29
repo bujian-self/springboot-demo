@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 第一个 测试请求
- * @author lijie
+ * @author bujian
  * @date 2021/6/18 09:51
  */
 @RestController
