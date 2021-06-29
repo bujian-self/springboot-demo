@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * @author bujian
  * @date 2021/6/18 09:51
  */
-@Api(tags="父子的试炼模块")
+@Api(tags="夫子的试炼模块")
 @RestController
 @RequestMapping("fuzideshilian")
 public class FuzideshilianController {
@@ -29,7 +29,7 @@ public class FuzideshilianController {
 
     @ApiOperation(value="查询信息",notes="根据实体类查询", httpMethod = "POST" )
     @PostMapping("/findInfo")
-    public Object findInfo(@ApiParam(value = "父子的试炼实体类对象",required = true) @RequestBody FuzideshilianDo bean){
+    public Object findInfo(@ApiParam(value = "夫子的试炼实体类对象",required = true) @RequestBody FuzideshilianDo bean){
         return fuzideshilianService.selectByBean(bean);
     }
 }
