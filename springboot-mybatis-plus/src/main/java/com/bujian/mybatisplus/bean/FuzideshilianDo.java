@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * 表数据信息
- * @author lijie
+ * @author bujian
  * @date 2021/6/16 11:15
  */
 @Data
