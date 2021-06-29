@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * controller层 代码
- * @author lijie
+ * @author bujian
  * @date 2021/6/18 09:51
  */
 @Api(tags="父子的试炼模块")
