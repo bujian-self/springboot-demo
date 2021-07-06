@@ -2,7 +2,7 @@ server:
   port: 8080
 # 默认后端访问路径
   interface:
-    url: /api
+    anonymous: /anon
 # 请求头
     header: Authorization
 
