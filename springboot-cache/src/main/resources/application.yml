@@ -1,0 +1,39 @@
+server:
+  port: 8080
+# 默认后端访问路径
+  interface:
+    anonymous: /anon
+# 请求头
+    header: Authorization
+
+spring:
+  application:
+    name: springboot-cache
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
+  cache:
+    caffeine:
+      spec: maximumSize=500, expireAfterAccess=30s
+
+mybatis-plus:
+#  mapper.xml扫描路径
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  configuration:
+#    数据库下划线转驼峰命名映射
+    map-underscore-to-camel-case: true
+#    自动映射列到字段或属性
+    auto-mapping-behavior: full
+#    sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+#      配置逻辑删除字段为1是删除
+      logic-not-delete-value: 1
+#      配置逻辑删除字段为0是未删除
+      logic-delete-value: 0
+
+logging:
+  config: classpath:logback-spring.xml

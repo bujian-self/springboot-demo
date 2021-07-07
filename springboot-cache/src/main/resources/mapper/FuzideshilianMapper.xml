@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bujian.cache.mapper.FuzideshilianMapper">
+
+    <sql id="Base_Column_List">
+        id, question, answer, create_time, last_operate, status, query_times
+    </sql>
+    <select id="selectByBean" resultType="com.bujian.cache.bean.FuzideshilianDo">
+        select
+        <include refid="Base_Column_List" />
+        from fuzideshilian
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="question != null and question != ''">and question like concat(concat('%', #{question}), '%')</if>
+            <if test="answer != null and answer != ''">and answer like concat(concat('%', #{answer}), '%')</if>
+            <if test="createTime != null">and create_time = #{createTime}</if>
+            <if test="lastOperate != null">and last_operate = #{lastOperate}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="queryTimes != null">and query_times = #{queryTimes}</if>
+        </where>
+    </select>
+
+</mapper>
+
