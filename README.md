@@ -7,3 +7,4 @@
 ### [集成 logback 日志](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-logger/HELP.md)
 ### [添加 interceptor 拦截器](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-interceptor/HELP.md)
 ### [升级 Swagger 改用 knife4j ](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-knife4j/HELP.md)
+### [添加cache缓存 ](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-cache/HELP.md)
