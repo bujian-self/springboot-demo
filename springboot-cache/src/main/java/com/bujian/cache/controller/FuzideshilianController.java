@@ -1,6 +1,5 @@
 package com.bujian.cache.controller;
 
-import com.bujian.cache.config.CacheConfig;
 import com.bujian.common.api.CrudApi;
 import com.bujian.cache.bean.FuzideshilianDo;
 import com.bujian.cache.service.FuzideshilianService;
@@ -10,12 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * controller层 代码
@@ -49,13 +43,16 @@ public class FuzideshilianController extends CrudApi<FuzideshilianService,Fuzide
         return fuzideshilianService.selectByBean(bean);
     }
 
+    /*
+     当使用 redis 时需要重新写一个配置,这个配置会失效
     @Autowired
-    private CacheConfig cacheConfig;
+    private RedisConfig redisConfig;
     @GetMapping("/getCache")
     @ApiOperation(value="查看缓存信息")
     public Object getCache(){
-        return cacheConfig.cacheManager().getCacheNames().stream()
-                .map(name -> cacheConfig.cacheManager().getCache(name).getNativeCache())
+        return redisConfig.cacheManager().getCacheNames().stream()
+                .map(name -> redisConfig.cacheManager().getCache(name).getNativeCache())
                 .collect(Collectors.toList());
     }
+    */
 }

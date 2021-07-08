@@ -1,69 +1,35 @@
-# springboot 项目 第八次 搭建
-* 添加`cache`缓存
-1. 添加`CacheConfig`配置文件
-```java
+package com.bujian.cache.config;
 
-@EnableCaching
-@Configuration
-public class CacheConfig {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.CacheKeyPrefix;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-  @Bean
-  public ConcurrentMapCacheManager cacheManager() {
-    return new ConcurrentMapCacheManager();
-  }
+import java.io.File;
+import java.time.Duration;
+import java.util.Objects;
 
-  /**
-   * 自定义key生成规则
-   */
-  @Bean(name = "CrudKeyGen")
-  public KeyGenerator CrudKeyGen() {
-    return new KeyGenerator() {
-      @Override
-      public Object generate(Object target, Method method, Object... params) {
-        // 获取目标方法的泛型入参 第二个参数是实体类的参数
-        Type[] actualTypeArguments = ((ParameterizedType) target.getClass().getGenericSuperclass()).getActualTypeArguments();
-        String name = ((Class) actualTypeArguments[actualTypeArguments.length - 1]).getSimpleName();
-        //PRO:USER:UID:18 命名规范
-        return name  + ":" + params[0];
-      }
-    };
-  }
-}
-```
-2. 在需要缓存的地方添加缓存相关的注解
-
-  [cache注解](https://blog.csdn.net/qq_32448349/article/details/101696892)
-
-3. 升级本地缓存为`redis`[教程](https://www.runoob.com/redis/redis-tutorial.html)
-   
-   在`maven`的`pom.xml`文件中添加以下内容
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
-```
-   在`application.yml`文件中添加以下内容
-```yaml
-spring:
-  cache:
-    type: redis
-    redis:
-      use-key-prefix: true # 开启前缀
-      key-prefix: ${spring.application.name} # 前缀名称
-      cache-null-values: false #是否缓存空值
-      time-to-live: 1h #缓存超时时间
-# redis 配置
-  redis:
-    # 默认16个分片
-    database: 0
-    host: redis-18419.c259.us-central1-2.gce.cloud.redislabs.com
-    port: 18419
-    password: eJwEgP1ufA81If7BYirHysAqZako3kxZ
-    timeout: 10000
-```
-4. 修改配置文件`CacheConfig`为`RedisConfig`
-```java
+/**
+ * 缓存配置文件
+ * @author bujian
+ * @date 2021/7/7 18:12
+ */
 @EnableCaching
 @Configuration
 public class RedisConfig extends CachingConfigurerSupport {
@@ -137,7 +103,3 @@ public class RedisConfig extends CachingConfigurerSupport {
         return jackson2JsonRedisSerializer;
     }
 }
-```
- 
----
-### [springboot 项目 第七次 搭建](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-knife4j/HELP.md)

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 public class CrudApi<S extends IService<V>, V> {
 	private final Class<V> clazz;
+	private final String cacheNames = "crud";
 	@Autowired
 	protected S baseService;
 	public CrudApi() {
@@ -44,7 +46,11 @@ public class CrudApi<S extends IService<V>, V> {
 		return baseService.save(vo);
 	}
 
-	@CachePut(cacheNames = "Crud", key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	/**
+	 * `@CachePut` 先执行方法体，然后根据 key 去 cache 中更新<br/>
+	 * 个人觉得没有必要,直接使用 CacheEvict 删除即可
+	 */
+	@CachePut(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
 	@ApiImplicitParam(name = "vo", value = "实体类数据必须包含主键", required = true)
 	@ApiOperation(value = "主键更新对象")
 	@PutMapping(value = "/")
@@ -52,9 +58,13 @@ public class CrudApi<S extends IService<V>, V> {
 		return baseService.updateById(vo);
 	}
 
-
-	@Cacheable(cacheNames = "Crud", key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
-//	@Cacheable(cacheNames = "Crud", keyGenerator = "crudKeyGen")
+	/**
+	 * `@Cacheable` 先根据 key 去查询 cache 中是否有这个 key<br/>
+	 * 有则直接返回,没有则执行方法体<br/>
+	 * 最后将返回的值添加到cache中,key为传入的key<br/>
+	 * 注意: 这里的key设置的是 `类名:第一个入参`
+	 */
+	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
 	@ApiImplicitParam(name = "id", value = "主键", required = true, example = "1")
 	@ApiOperation(value = "主键查询")
 	@GetMapping(value = "/{id}")
@@ -62,7 +72,10 @@ public class CrudApi<S extends IService<V>, V> {
 		return baseService.getById(id);
 	}
 
-	@CacheEvict(cacheNames = "Crud", key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	/**
+	 * `@CacheEvict` 先执行方法体，然后根据 key 去 cache 中删除<br/>
+	 */
+	@CacheEvict(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
 	@ApiImplicitParam(name = "ids", value = "主键", required = true, example = "1", dataType = "List")
 	@ApiOperation(value = "主键删除对象")
 	@DeleteMapping(value = "/{ids}")
@@ -73,7 +86,7 @@ public class CrudApi<S extends IService<V>, V> {
 	/**
 	 * 包含分页查询的数据
 	 */
-	@Cacheable(cacheNames = "Crud", key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
 	@ApiImplicitParam(name = "json", value = "包含分页参数的实体类json", required = true)
 	@ApiOperation(value = "实体类分页查询对象")
 	@PostMapping(value = "/searchEntity")
