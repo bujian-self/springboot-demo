@@ -68,74 +68,75 @@ spring:
 @Configuration
 public class RedisConfig extends CachingConfigurerSupport {
 
-    @Value("${spring.application.name:}")
-    private String appName;
-    @Value("${spring.cache.redis.use-key-prefix:}")
-    private Boolean useKeyPrefix;
-    @Value("${spring.cache.redis.key-prefix:}")
-    private String keyPrefix;
-    @Value("${spring.cache.redis.time-to-live:0}")
-    private Duration timeToLive;
+   @Value("${spring.cache.redis.key-prefix:}")
+   private String keyPrefix;
+   @Value("${spring.cache.redis.time-to-live:0}")
+   private Duration timeToLive;
 
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory factory) {
-        return RedisCacheManager
-                .builder(factory)
-                .cacheDefaults(this.getRedisCacheConfiguration())
-                .build();
-    }
+   /**
+    * redisTemplate 模板
+    * 方便手动调用,比较灵活
+    */
+   @Bean(name = "redisTemplate")
+   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+      StringRedisSerializer keySerializer = new StringRedisSerializer();
+      // 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
+      Jackson2JsonRedisSerializer valueSerializer = this.getJackson2JsonRedisSerializer();
 
-    /**
-     * 配置序列化（解决乱码的问题）
-     */
-    private RedisCacheConfiguration getRedisCacheConfiguration() {
-        //全局添加cacheName前缀
-        return cacheConfigAddkeyPrefix(
-                RedisCacheConfiguration
-                .defaultCacheConfig()
-                // 超时时间
-                .entryTtl(timeToLive)
-                // key 序列化
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                // value 序列化
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(this.getJackson2JsonRedisSerializer()))
-                .disableCachingNullValues()
-        );
-    }
+      RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+      // 配置连接工厂
+      redisTemplate.setConnectionFactory(redisConnectionFactory);
+      // key 序列化
+      redisTemplate.setKeySerializer(keySerializer);
+      redisTemplate.setHashKeySerializer(keySerializer);
+      // value 序列化
+      redisTemplate.setValueSerializer(valueSerializer);
+      redisTemplate.setHashValueSerializer(valueSerializer);
+      redisTemplate.afterPropertiesSet();
+      return redisTemplate;
+   }
+   /**
+    * 将需要保存的数据序列化
+    */
+   private Jackson2JsonRedisSerializer getJackson2JsonRedisSerializer() {
+      //解决查询缓存转换异常的问题
+      ObjectMapper om = new ObjectMapper();
+      // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
+      om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+      // 解决jackson2无法反序列化LocalDateTime的问题
+      om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+      om.registerModule(new JavaTimeModule());
+      // 指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会跑出异常
+      om.activateDefaultTyping( LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL );
 
-    /**
-     * 给cacheName添加前缀<br/>
-     * 按需要修改
-     */
-    private RedisCacheConfiguration cacheConfigAddkeyPrefix(RedisCacheConfiguration redisCacheConfiguration) {
-        if (!Objects.equals(true,useKeyPrefix) && StringUtils.isBlank(keyPrefix)) {
-            return redisCacheConfiguration;
-        }
+      Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+      jackson2JsonRedisSerializer.setObjectMapper(om);
+      return jackson2JsonRedisSerializer;
+   }
 
-        String keyPrefixNew =  StringUtils.isNotBlank(keyPrefix) ? keyPrefix : appName;
-        if (StringUtils.isBlank(keyPrefixNew)) {
-            String systemPath = System.getProperty("user.dir");
-            keyPrefixNew = systemPath.substring(systemPath.lastIndexOf(File.separator)+1);
-        }
-        return redisCacheConfiguration.prefixCacheNameWith(keyPrefixNew + CacheKeyPrefix.SEPARATOR);
-    }
+   @Bean
+   public CacheManager cacheManager(RedisConnectionFactory factory) {
+      return RedisCacheManager
+              .builder(RedisCacheWriter.nonLockingRedisCacheWriter(factory))
+              .cacheDefaults(this.getRedisCacheConfiguration())
+              .build();
+   }
 
-    /**
-     * 将需要保存的数据序列化
-     */
-    private Jackson2JsonRedisSerializer getJackson2JsonRedisSerializer() {
-        //解决查询缓存转换异常的问题
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        // 解决jackson2无法反序列化LocalDateTime的问题
-        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        om.registerModule(new JavaTimeModule());
-        om.activateDefaultTyping( LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL );
-
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-        return jackson2JsonRedisSerializer;
-    }
+   private RedisCacheConfiguration getRedisCacheConfiguration() {
+      return RedisCacheConfiguration
+              .defaultCacheConfig()
+              // 超时时间
+              .entryTtl(timeToLive)
+              // key 前缀
+              .computePrefixWith(cacheName -> keyPrefix + cacheName + "::")
+              // key 序列化
+              .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+              // value 序列化
+              .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(getJackson2JsonRedisSerializer()))
+              // 不缓存 null 值
+              .disableCachingNullValues()
+              ;
+   }
 }
 ```
  

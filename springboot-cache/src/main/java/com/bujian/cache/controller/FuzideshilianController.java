@@ -1,15 +1,21 @@
 package com.bujian.cache.controller;
 
-import com.bujian.common.api.CrudApi;
 import com.bujian.cache.bean.FuzideshilianDo;
 import com.bujian.cache.service.FuzideshilianService;
+import com.bujian.cache.utils.RedisUtil;
+import com.bujian.common.api.CrudApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * controller层 代码
@@ -20,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("fuzideshilian")
 @Slf4j
-public class FuzideshilianController extends CrudApi<FuzideshilianService,FuzideshilianDo> {
+public class FuzideshilianController extends CrudApi<FuzideshilianService, FuzideshilianDo> {
 
     @Autowired
     private FuzideshilianService fuzideshilianService;
@@ -43,16 +49,25 @@ public class FuzideshilianController extends CrudApi<FuzideshilianService,Fuzide
         return fuzideshilianService.selectByBean(bean);
     }
 
-    /*
-     当使用 redis 时需要重新写一个配置,这个配置会失效
     @Autowired
-    private RedisConfig redisConfig;
-    @GetMapping("/getCache")
-    @ApiOperation(value="查看缓存信息")
-    public Object getCache(){
-        return redisConfig.cacheManager().getCacheNames().stream()
-                .map(name -> redisConfig.cacheManager().getCache(name).getNativeCache())
-                .collect(Collectors.toList());
+    private RedisTemplate<String,Object> redisTemplate;
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @ApiOperation(value="redis set 测试redis插入")
+    @GetMapping("redisSet")
+    public Object redisSet(){
+        redisTemplate.opsForValue().set("keyTest","valueTest");
+        redisUtil.sSet("keyTest2","valueTest2","valueTest3","valueTest4","valueTest5");
+        return null;
     }
-    */
+    @ApiOperation(value="redis get 测试redis 获取")
+    @GetMapping("redisGet")
+    public Object redisGet(){
+        List<Object> keyTest2 = new ArrayList<>();
+        keyTest2.addAll(Arrays.asList(redisUtil.sGet("keyTest2").toArray()));
+        Object keyTest = redisTemplate.opsForValue().get("keyTest");
+        keyTest2.add(keyTest);
+        return keyTest2;
+    }
 }

@@ -19,7 +19,7 @@ spring:
     type: redis
     redis:
       use-key-prefix: true
-      key-prefix: ${spring.application.name}
+      key-prefix: '${spring.application.name}::'
       cache-null-values: false #是否缓存空值
       time-to-live: 1h #缓存超时时间ms
 # redis 配置
