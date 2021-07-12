@@ -19,9 +19,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.Objects;
 
 /**
  * 缓存配置文件
@@ -49,12 +51,16 @@ public class RedisConfig extends CachingConfigurerSupport {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         // 配置连接工厂
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+        //redis 开启事务
+        redisTemplate.setEnableTransactionSupport(true);
         // key 序列化
-        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        RedisSerializer keySerializer = new MyStringSerializer(keyPrefix);
+//        RedisSerializer keySerializer = new MyObjectSerializer(keyPrefix);
+//        RedisSerializer keySerializer = new StringRedisSerializer();
         redisTemplate.setKeySerializer(keySerializer);
         redisTemplate.setHashKeySerializer(keySerializer);
         // 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
-        Jackson2JsonRedisSerializer valueSerializer = this.getJackson2JsonRedisSerializer();
+        RedisSerializer valueSerializer = this.getJackson2JsonRedisSerializer();
         // value 序列化
         redisTemplate.setValueSerializer(valueSerializer);
         redisTemplate.setHashValueSerializer(valueSerializer);
@@ -99,7 +105,7 @@ public class RedisConfig extends CachingConfigurerSupport {
                 // 超时时间
                 .entryTtl(timeToLive)
                 // key 前缀
-                .computePrefixWith(cacheName -> keyPrefix + cacheName + "::")
+                .computePrefixWith(cacheName -> keyPrefix + (Objects.equals("null",cacheName.toLowerCase()) ? "" : (cacheName + "::")))
                 // key 序列化
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 // value 序列化

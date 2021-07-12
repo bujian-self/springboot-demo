@@ -29,7 +29,11 @@ import java.util.List;
  */
 public class CrudApi<S extends IService<V>, V> {
 	private final Class<V> clazz;
-	private final String cacheNames = "crud";
+	/**
+	 * null 字符串 会在建 key 时删除<br/>
+	 * 在配置 RedisCacheConfiguration 时 剔除了null值
+	 */
+	private final String cacheNames = "null";
 	@Autowired
 	protected S baseService;
 	public CrudApi() {
@@ -50,7 +54,7 @@ public class CrudApi<S extends IService<V>, V> {
 	 * `@CachePut` 先执行方法体，然后根据 key 去 cache 中更新<br/>
 	 * 个人觉得没有必要,直接使用 CacheEvict 删除即可
 	 */
-	@CachePut(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	@CachePut(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+'::'+#p0")
 	@ApiImplicitParam(name = "vo", value = "实体类数据必须包含主键", required = true)
 	@ApiOperation(value = "主键更新对象")
 	@PutMapping(value = "/")
@@ -64,7 +68,7 @@ public class CrudApi<S extends IService<V>, V> {
 	 * 最后将返回的值添加到cache中,key为传入的key<br/>
 	 * 注意: 这里的key设置的是 `类名:第一个入参`
 	 */
-	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+'::'+#p0")
 	@ApiImplicitParam(name = "id", value = "主键", required = true, example = "1")
 	@ApiOperation(value = "主键查询")
 	@GetMapping(value = "/{id}")
@@ -75,7 +79,7 @@ public class CrudApi<S extends IService<V>, V> {
 	/**
 	 * `@CacheEvict` 先执行方法体，然后根据 key 去 cache 中删除<br/>
 	 */
-	@CacheEvict(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	@CacheEvict(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+'::'+#p0")
 	@ApiImplicitParam(name = "ids", value = "主键", required = true, example = "1", dataType = "List")
 	@ApiOperation(value = "主键删除对象")
 	@DeleteMapping(value = "/{ids}")
@@ -86,7 +90,7 @@ public class CrudApi<S extends IService<V>, V> {
 	/**
 	 * 包含分页查询的数据
 	 */
-	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+':'+#p0")
+	@Cacheable(cacheNames=cacheNames, key = "targetClass.getGenericSuperclass().getActualTypeArguments()[1].getSimpleName()+'::'+#p0")
 	@ApiImplicitParam(name = "json", value = "包含分页参数的实体类json", required = true)
 	@ApiOperation(value = "实体类分页查询对象")
 	@PostMapping(value = "/searchEntity")

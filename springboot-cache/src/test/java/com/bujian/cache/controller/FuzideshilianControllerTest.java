@@ -46,11 +46,13 @@ class FuzideshilianControllerTest {
     void findInfo() throws Exception {
         System.err.println(
                 mockMvc.perform(
-                        MockMvcRequestBuilders.post("/fuzideshilian/findInfo")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSONObject.toJSONString(JSONObject.parse(
+                        MockMvcRequestBuilders
+                                .post("/fuzideshilian/findInfo")
+                                .header("Authorization","admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(JSONObject.toJSONString(JSONObject.parse(
                                 "{'question':'李白','createTime':'2019-12-18 01:40:53'}"
-                        )))
+                                )))
                 ).andDo(MockMvcResultHandlers.print())
                         .andExpect(MockMvcResultMatchers.status().isOk())
                         .andReturn().getResponse().getContentAsString()//将相应的数据转换为字符串
