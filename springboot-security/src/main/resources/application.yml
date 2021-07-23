@@ -1,8 +1,11 @@
 server:
   port: 8080
-# 默认后端访问路径
-  interface:
-    anonymous: /anon
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: true
+  # 请求前缀
+  pathMapping: /anon
 
 spring:
   application:
