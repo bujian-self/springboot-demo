@@ -1,18 +1,19 @@
 package com.bujian.security.config;
 
-import com.bujian.security.filter.AuthTokenFilter;
-//import com.bujian.security.service.UserService;
+import com.bujian.security.filter.JwtAuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
@@ -25,10 +26,15 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)//开启权限注解,默认是关闭的
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
+     * 自定义用户认证逻辑
+     */
+    @Autowired
+    private UserDetailsService userDetailsService;
+    /**
      * token认证过滤器
      */
     @Autowired
-    private AuthTokenFilter authTokenFilter;
+    private JwtAuthTokenFilter jwtAuthTokenFilter;
     /**
      * 跨域过滤器
      */
@@ -45,6 +51,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 解决 无法直接注入 AuthenticationManager
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+    /**
+     * 身份认证接口
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     }
 
     @Override
@@ -65,9 +87,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 关闭退出操作，自己从controller里面写退出逻辑
         http.logout().clearAuthentication(true).invalidateHttpSession(true).disable();
         // 添加JWT filter
-        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class);
         // 添加CORS filter
-        http.addFilterBefore(corsFilter, AuthTokenFilter.class);
+        http.addFilterBefore(corsFilter, JwtAuthTokenFilter.class);
         http.addFilterBefore(corsFilter, LogoutFilter.class);
     }
 }
