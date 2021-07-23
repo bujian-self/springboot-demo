@@ -46,12 +46,18 @@ import java.util.*;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    @Value("${server.interface.anonymous:/anon}")
-    private String prefix;
+    /** 是否开启swagger */
+    @Value("${swagger.enabled:false}")
+    private boolean enabled;
+
+    /** 设置请求的统一前缀 */
+    @Value("${swagger.pathMapping:/anon}")
+    private String pathMapping;
 
     @Bean
     public Docket docket() {
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(
+        return new Docket(DocumentationType.SWAGGER_2)
+                .enable(enabled).apiInfo(
                 new ApiInfoBuilder()
                         //页面标题
                         .title("springBoot 测试使用 Swagger2 构建 RESTful API")
@@ -94,7 +100,7 @@ public class SwaggerConfig {
             resourceHttpRequestHandler.setServletContext(servletContext);
             resourceHttpRequestHandler.afterPropertiesSet();
             //设置新的路径
-            urlMap.put(prefix + "/webjars/**", resourceHttpRequestHandler);
+            urlMap.put(pathMapping + "/webjars/**", resourceHttpRequestHandler);
         }
         {
             PathResourceResolver pathResourceResolver = new PathResourceResolver();
@@ -107,7 +113,7 @@ public class SwaggerConfig {
             resourceHttpRequestHandler.setServletContext(servletContext);
             resourceHttpRequestHandler.afterPropertiesSet();
             //设置新的路径
-            urlMap.put(prefix + "/**", resourceHttpRequestHandler);
+            urlMap.put(pathMapping + "/**", resourceHttpRequestHandler);
         }
         urlHandlerMapping.setUrlMap(urlMap);
         //调整DispatcherServlet关于SimpleUrlHandlerMapping的排序
