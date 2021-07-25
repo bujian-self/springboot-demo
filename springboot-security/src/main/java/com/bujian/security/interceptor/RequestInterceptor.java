@@ -20,7 +20,7 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        log.info("接收到请求");
+        log.info("接收到请求: {}", request.getRequestURI());
         ThreadLocalUtil.put("start",System.currentTimeMillis());
         ThreadLocalUtil.put("url",request.getRequestURI());
         return true;

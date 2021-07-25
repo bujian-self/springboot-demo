@@ -1,6 +1,5 @@
 package com.bujian.security.controller;
 
-
 import com.alibaba.fastjson.JSONObject;
 import com.bujian.security.service.LoginUserService;
 import io.swagger.annotations.Api;
@@ -29,8 +28,8 @@ public class LoginController {
 
     @ApiImplicitParam(name = "json", value = "用户登录信息", required = true, example = "{'username':'user','password':'123456'}")
     @ApiOperation(value="用户登录")
-    @PostMapping("/anon/login")
-    public Object login(@RequestBody JSONObject json){
+    @PostMapping("${swagger.pathMapping:/anon}"+"/login")
+    public Object login(@RequestBody JSONObject json) {
         log.info("用户登录: {}", json);
         // TODO login user Front check
         String username = json.getString("username");
@@ -47,8 +46,16 @@ public class LoginController {
         return "logout";
     }
 
+    @ApiOperation(value="刷新token")
+    @GetMapping("/refreshToken")
+    public Object refreshToken(HttpServletRequest request){
+        System.err.println("refreshToken");
+        //TODO refreshToken
+        return loginService.refreshToken(request);
+    }
+
     @ApiOperation(value="hello")
-    @RequestMapping("/hello")
+    @GetMapping("/hello")
     public Object hello(Authentication authentication){
         return authentication.getPrincipal();
     }

@@ -23,12 +23,13 @@ import org.springframework.web.filter.CorsFilter;
 
 /**
  * Security 权限配置
- * @author lijie
+ * @EnableGlobalMethodSecurity 开启权限注解,默认是关闭的
+ * @author bujian
  * @date 2021/7/23
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)//开启权限注解,默认是关闭的
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * 自定义用户认证逻辑
@@ -83,12 +84,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 基于token，所以不需要session
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // 过滤请求 允许匿名访问的路径
-        http.authorizeRequests().antMatchers(anonUrl+"/**").anonymous()
+        http.authorizeRequests().antMatchers(anonUrl+"/**", "/error").anonymous()
                 .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js")
                 // 除上面外的所有请求全部需要鉴权认证
                 .permitAll().anyRequest().authenticated();
-        // 认证失败处理类，前后端分离前端不会302重定向，直接返回403异常
-        http.exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
+//         认证失败处理类，前后端分离前端不会302重定向，返回403异常没有错误信息，所以直接上抛异常
+        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> { throw authException; });
         // 关闭退出操作，自己从controller里面写退出逻辑
         http.logout().clearAuthentication(true).invalidateHttpSession(true).disable();
         // 添加JWT filter

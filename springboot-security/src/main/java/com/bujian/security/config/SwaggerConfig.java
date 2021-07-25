@@ -126,10 +126,10 @@ public class SwaggerConfig {
      */
     @Controller
     @ApiIgnore
-    @RequestMapping(value = "${server.anonymous:/anon}")
+    @RequestMapping(value = "${swagger.pathMapping:/anon}")
     public static class SwaggerResourceController implements InitializingBean {
 
-        @Value("${server.interface.anonymous:/anon}")
+        @Value("${swagger.pathMapping:/anon}")
         private String prefix;
 
         @Autowired

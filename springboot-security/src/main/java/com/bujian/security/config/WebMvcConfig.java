@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * 构建mvc配置 添加了1个拦截器
- * @author lijie
+ * @author bujian
  * @date 2021/7/5 18:01
  */
 @Configuration
