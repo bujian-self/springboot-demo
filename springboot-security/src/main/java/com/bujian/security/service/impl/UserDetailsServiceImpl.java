@@ -64,8 +64,8 @@ public class UserDetailsServiceImpl implements UserDetailsService, LoginUserServ
     }
 
     @Override
-    public String refreshToken(HttpServletRequest request) {
-        return jwtTokenUtil.refreshToken(request);
+    public String refreshToken() {
+        return jwtTokenUtil.refreshToken();
     }
 
 }

@@ -2,6 +2,7 @@ package com.bujian.security.filter;
 
 import com.bujian.security.bean.LoginUser;
 import com.bujian.security.utils.JwtTokenUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,15 +29,28 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        // 解密 token 获取 登录用户信息
-        LoginUser loginUser = jwtTokenUtil.claims2JavaObject(jwtTokenUtil.decryptToken(request), LoginUser.class);
-        if (loginUser != null) {
-            // 将 用户 交给 Security 管理
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        // 获取 token
+        String token = jwtTokenUtil.getToken();
+        if (StringUtils.isBlank(token)) {
+            chain.doFilter(request, response);
+            return;
         }
+        // 解密 token 获取 登录用户信息
+        LoginUser loginUser = jwtTokenUtil.claims2JavaObject(jwtTokenUtil.decryptJwt(token), LoginUser.class);
+        if (loginUser == null) {
+            chain.doFilter(request, response);
+            return;
+        }
+        // 校验 token 是否合法
+        verifyToken(token);
+        // 将 用户 交给 Security 管理
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
         chain.doFilter(request, response);
     }
-
+    // 验证/更新 token
+    private void verifyToken(String token) {
+    }
 }

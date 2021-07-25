@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -86,15 +89,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     /**
-     * 解密token
+     * 获取 token
      */
-    public Claims decryptToken(HttpServletRequest request) {
-        String toekn = request.getHeader(this.header);
-        if (StringUtils.isBlank(toekn)) {
-            return null;
-        }
-        return this.decryptJwt(toekn);
+    public String getToken() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        return request.getHeader(this.header);
     }
+
     /**
      * 解密 jwt
      */
@@ -113,18 +115,18 @@ public class JwtTokenUtil implements Serializable {
     public <T> T claims2JavaObject(Claims claims, Class<T> clazz){
         Assert.isTrue(claims!=null , "未获取到 claims");
         Assert.isTrue(clazz!=null , "Class 不能为空");
-        return JSONObject.parseObject(JSONObject.toJSONString(claims), clazz);
+        return claims.size() < 1 ? null : JSONObject.parseObject(JSONObject.toJSONString(claims), clazz);
     }
 
     /**
      * 刷新 jwt 时间
      */
-    public String refreshToken(HttpServletRequest request) {
-        String toekn = request.getHeader(this.header);
-        if (StringUtils.isBlank(toekn)) {
+    public String refreshToken() {
+        String token = this.getToken();
+        if (StringUtils.isBlank(token)) {
             return null;
         }
-        return this.refreshJwt(toekn);
+        return this.refreshJwt(token);
     }
 
     /**

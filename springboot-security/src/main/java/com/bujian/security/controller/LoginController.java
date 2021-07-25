@@ -48,10 +48,10 @@ public class LoginController {
 
     @ApiOperation(value="刷新token")
     @GetMapping("/refreshToken")
-    public Object refreshToken(HttpServletRequest request){
+    public Object refreshToken(){
         System.err.println("refreshToken");
         //TODO refreshToken
-        return loginService.refreshToken(request);
+        return loginService.refreshToken();
     }
 
     @ApiOperation(value="hello")

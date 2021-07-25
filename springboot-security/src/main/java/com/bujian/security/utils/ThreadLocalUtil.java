@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
  * @date 2021/7/5 14:41
  */
 public class ThreadLocalUtil {
+    private ThreadLocalUtil(){}
     private static ThreadLocal<JSONObject> localVar ;
     private static final int INITIAL_CAPACITY = 16 ;
 

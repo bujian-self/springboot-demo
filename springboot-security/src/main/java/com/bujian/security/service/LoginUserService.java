@@ -19,8 +19,7 @@ public interface LoginUserService {
 
     /**
      * 刷新 token
-     * @param request
      * @return java.lang.String token
      */
-    String refreshToken(HttpServletRequest request);
+    String refreshToken();
 }
