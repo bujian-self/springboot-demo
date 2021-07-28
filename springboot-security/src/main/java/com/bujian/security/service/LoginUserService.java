@@ -22,4 +22,10 @@ public interface LoginUserService {
      * @return java.lang.String token
      */
     String refreshToken();
+
+    /**
+     * 退出
+     * @return java.lang.String
+     */
+    String logout();
 }

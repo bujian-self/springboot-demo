@@ -2,7 +2,7 @@ package com.bujian.security.service.impl;
 
 import com.bujian.security.bean.LoginUser;
 import com.bujian.security.service.LoginUserService;
-import com.bujian.security.utils.JwtTokenUtil;
+import com.bujian.security.service.TokenService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,9 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -29,12 +26,12 @@ public class UserDetailsServiceImpl implements UserDetailsService, LoginUserServ
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private TokenService tokenService;
 
     @Override
     public LoginUser loadUserByUsername(String username) throws UsernameNotFoundException {
         Assert.isTrue(StringUtils.isNotBlank(username) , "登录账户不能为空");
-        // 查询 用户
+        // TODO 数据库 查询 用户 逻辑
         LoginUser user = null;
         if (Objects.equals("admin",username)) {
             user = new LoginUser();
@@ -52,20 +49,21 @@ public class UserDetailsServiceImpl implements UserDetailsService, LoginUserServ
     public String login(String username, String password) {
         // 用户 认证
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        // 获取 登录用户信息
-        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-        // 创建 token
-        Map<String, Object> claims = new HashMap<>(3);
-        claims.put("username",loginUser.getUsername());
-        claims.put("password",loginUser.getPassword());
-        claims.put("roles",loginUser.getRoles());
-        // 返回
-        return jwtTokenUtil.creatJwt(claims);
+        // 获取 登录用户信息 创建 token 返回
+        return tokenService.creatToken((LoginUser) authenticate.getPrincipal());
     }
 
     @Override
     public String refreshToken() {
-        return jwtTokenUtil.refreshToken();
+        return tokenService.refreshToken();
+    }
+
+    @Override
+    public String logout() {
+        if (tokenService.removeToken()) {
+            return "删除成功";
+        }
+        return "删除失败";
     }
 
 }

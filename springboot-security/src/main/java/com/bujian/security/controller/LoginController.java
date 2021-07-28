@@ -39,17 +39,16 @@ public class LoginController {
 
     @ApiImplicitParam(name = "json", value = "退出登录时包含的信息", required = true)
     @ApiOperation(value="退出登录")
-    @RequestMapping("/logout")
+    @PostMapping("/logout")
     public Object logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication, @RequestBody JSONObject json){
         System.err.println("logout");
         //TODO logout
-        return "logout";
+        return loginService.logout();
     }
 
     @ApiOperation(value="刷新token")
     @GetMapping("/refreshToken")
     public Object refreshToken(){
-        System.err.println("refreshToken");
         //TODO refreshToken
         return loginService.refreshToken();
     }

@@ -34,7 +34,7 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${token.header:Authorization}")
     private String header;
-    @Value("${token.secret:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}")
+    @Value("${token.secret:abcde}")
     private String secret;
     @Value("${token.expireTime:10m}")
     private Duration expireTime;
@@ -134,6 +134,7 @@ public class JwtTokenUtil implements Serializable {
      */
     public String refreshJwt(String token) {
         Claims claims = decryptJwt(token);
+        Assert.isTrue(claims!=null && claims.size() > 0, "未获取到 claims");
         Date end = null;
         if (expireTime != null && expireTime.getSeconds() > 0) {
             end = new Date(System.currentTimeMillis() + expireTime.toMillis());

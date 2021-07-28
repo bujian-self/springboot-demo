@@ -55,7 +55,7 @@ public class FuzideshilianServiceImpl extends ServiceImpl<FuzideshilianMapper, F
 
     /**
      * 先存后取
-     */
+     *
     public List<FuzideshilianDo> selectByBean2(FuzideshilianDo bean) {
         log.info("FuzideshilianDo根据实体类获取信息: {}", bean);
         String key = "FuzideshilianDo::" + JSONObject.toJSONString(bean);
@@ -67,6 +67,7 @@ public class FuzideshilianServiceImpl extends ServiceImpl<FuzideshilianMapper, F
                     if (!redisService.hasKey(key)) {
                         redisService.saveOrUpdate(key, fuzideshilianDos);
                         log.info("加入缓存中成功");
+                        return fuzideshilianDos;
                     }
                 }
             }
@@ -74,4 +75,5 @@ public class FuzideshilianServiceImpl extends ServiceImpl<FuzideshilianMapper, F
         log.info("从缓存中获取");
         return redisService.getList(key, FuzideshilianDo.class);
     }
+    */
 }
