@@ -10,3 +10,4 @@
 ### [升级 Swagger 改用 knife4j ](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-knife4j/HELP.md)
 ### [添加cache缓存 ](https://github.com/lijiepersion/springboot-demo/blob/main/springboot-cache/HELP.md)
 ### [简单 security 验证 ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-security/HELP.md)
+### [集成 sa-token 验证 ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-satoken/HELP.md)
