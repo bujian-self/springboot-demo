@@ -13,3 +13,4 @@
 ### [简单 security 验证 ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-security/HELP.md)
 ### [集成 sa-token 验证 ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-satoken/HELP.md)
 ### [全局异常 ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-exception/HELP.md)
+### [集成 flyway ](https://github.com/bujian-self/springboot-demo/blob/main/springboot-flyway/HELP.md)
