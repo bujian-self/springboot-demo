@@ -1,0 +1,152 @@
+server:
+  port: 8080
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: true
+  # 请求前缀
+  pathMapping: /anon
+
+spring:
+  #出现错误时, 直接抛出异常
+  application:
+    name: springboot-uploadfile
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  servlet:
+    # 项目启动时删除旧文件夹，默认为 true
+    delete-before-starting: false
+    multipart:
+      # 开启文件上传支持，默认为 true
+      enabled: true
+      # 文件写入磁盘的阀值，默认为 0
+      file-size-threshold: 0B
+      # 所有请求最大值
+      max-request-size: 50MB
+      # 单文件最大值
+      max-file-size: 10MB
+      # 文件是否延迟解析，默认为 false
+      resolve-lazily: false
+
+  # 数据库
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
+  flyway:
+    # 如果启动的时候需要flyway管理sql脚本的话，将enabled设置为true
+    enabled: true
+    # 如果数据库不是空表，需要设置成 true，否则启动报错
+    baseline-on-migrate: true
+    # 验证错误时 是否自动清除数据库 高危操作!
+    clean-on-validation-error: false
+    locations: classpath:db/migration
+  cache:
+    type: redis
+    redis:
+      use-key-prefix: true
+      key-prefix: '${spring.application.name}::'
+      cache-null-values: false #是否缓存空值
+      time-to-live: 1h #缓存超时时间ms
+  # redis 配置
+  redis:
+    # 默认16个分片
+    database: 0
+    host: redis-18419.c259.us-central1-2.gce.cloud.redislabs.com
+    port: 18419
+    password: eJwEgP1ufA81If7BYirHysAqZako3kxZ
+    timeout: 10000
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制） 默认 8
+        max-active: 8
+        # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认 -1
+        max-wait: -1
+        # 连接池中的最大空闲连接 默认 8
+        max-idle: 8
+        # 连接池中的最小空闲连接 默认 0
+        min-idle: 0
+  quartz:
+    # 将任务等保存化到数据库
+    job-store-type: jdbc
+#    jdbc:
+#      initialize-schema: always
+    # 是否等待任务执行完毕后，容器才会关闭
+    wait-for-jobs-to-complete-on-shutdown: true
+    # 配置的job是否覆盖已经存在的JOB信息
+    overwrite-existing-jobs: false
+    # 这里居然是个map，搞得智能提示都没有，佛了
+    properties:
+      org:
+        quartz:
+          # scheduler相关
+          scheduler:
+            # 集群名，区分同一系统的不同实例，若使用集群功能，则每一个实例都要使用相同的名字
+            instanceName: scheduler
+            # 实例id 生成策略
+            instanceId: AUTO
+          # 线程池相关
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            # 线程数
+            threadCount: 10
+            # 线程优先级
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+          # 持久化相关
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            # 类似于Hibernate的dialect，用于处理DB之间的差异，StdJDBCDelegate能满足大部分的DB（授权）
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            # 表示数据库中相关表是QRTZ_开头的
+            tablePrefix: QRTZ_
+            useProperties: false
+            # 如果有多个Quartz实例在用同一套数据库时，必须设置为true
+            isClustered: true
+            # 检入到数据库中的频率
+            clusterCheckinInterval: 15000
+            # 这是JobStore能处理的错过触发的Trigger的最大数量。处理太多（2打）很快就会导致数据库表被锁定够长的时间，
+#            maxMisfiresToHandleAtATime: 1
+            # 设置这个参数为true会告诉Quartz从数据源获取连接后不要调用它的setAutoCommit(false)方法。
+#            dontSetAutoCommitFalse: false
+
+mybatis-plus:
+  #  mapper.xml扫描路径
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  configuration:
+    #    数据库下划线转驼峰命名映射
+    map-underscore-to-camel-case: true
+    #    自动映射列到字段或属性
+    auto-mapping-behavior: full
+    #    sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      #      配置逻辑删除字段为1是删除
+      logic-not-delete-value: 1
+      #      配置逻辑删除字段为0是未删除
+      logic-delete-value: 0
+
+logging:
+  config: classpath:logback-spring.xml
+
+# Sa-Token配置
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: satoken
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  activity-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
